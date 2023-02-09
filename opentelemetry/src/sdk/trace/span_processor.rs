@@ -46,6 +46,7 @@ use futures_channel::oneshot;
 use futures_util::future::{self, Either};
 use futures_util::{pin_mut, stream, StreamExt as _};
 use std::{env, fmt, str::FromStr, thread, time::Duration};
+use std::any::Any;
 
 /// Delay interval between two consecutive exports.
 const OTEL_BSP_SCHEDULE_DELAY: &str = "OTEL_BSP_SCHEDULE_DELAY";
@@ -81,6 +82,8 @@ pub trait SpanProcessor: Send + Sync + std::fmt::Debug {
     /// Shuts down the processor. Called when SDK is shut down. This is an
     /// opportunity for processors to do any cleanup required.
     fn shutdown(&mut self) -> TraceResult<()>;
+    /// For casting
+    fn as_any(&self) -> &dyn Any;
 }
 
 /// A [`SpanProcessor`] that exports synchronously when spans are finished.
@@ -167,6 +170,10 @@ impl SpanProcessor for SimpleSpanProcessor {
         }
 
         Ok(())
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 
@@ -271,6 +278,10 @@ impl<R: TraceRuntime> SpanProcessor for BatchSpanProcessor<R> {
         futures_executor::block_on(res_receiver)
             .map_err(|err| TraceError::Other(err.into()))
             .and_then(|identity| identity)
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 

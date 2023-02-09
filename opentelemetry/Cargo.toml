@@ -1,5 +1,5 @@
 [package]
-name = "opentelemetry"
+name = "opentelemetry-spanprocessor-any"
 version = "0.17.0"
 description = "A metrics collection and distributed tracing framework"
 homepage = "https://github.com/open-telemetry/opentelemetry-rust"
